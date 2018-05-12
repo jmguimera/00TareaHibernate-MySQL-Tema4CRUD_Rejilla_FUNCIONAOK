@@ -1,39 +1,47 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package hibernateVistas;
 
-/* modificado por josem */
 import clientes.entity.Clientes; // añadida clase creada por hibernate entidad cliente 
 import hibernateDAO.ClientesDAO; // clase que contiene operacion admin base de datos (CRUD)
 
 import javax.swing.table.DefaultTableModel;
 import java.awt.Point;
 import javax.swing.JOptionPane;
-/**
- * @author Fermin Velez Bello
- * modificado por jose miguel guimera padron (josem) para las partes de persistencia hibernate
- */
-public class VentanaPrincipal extends javax.swing.JFrame {
-      String nifPinchado; 
 
-     private DefaultTableModel modelo;  // DECIRLE QUE LA REJILLA USE ESTE MODLO : BOTON DERECHO EN REJILLA-->TABLE CONTENT->CUSTOM ->PONER EL NOMBRE Del atributo , en este caso modelo
+public class VentanaPrincipal extends javax.swing.JFrame {
     
-    /* añadido por josem */  
-    // objeto que da acceso a las operaciones de insertar, editar, eliminar y otras con hibernate
+/**
+ * Objeto PARA DECIRLE QUE LA REJILLA USE ESTE MODELO : 
+ * BOTON DERECHO EN REJILLA-->TABLE CONTENT->CUSTOM ->PONER EL NOMBRE Del atributo,
+ * en este caso modelo
+ */
+    private DefaultTableModel modelo;  
+
+    /**
+     * Variable que contiene el valor del nif del renglon que si pinche en la
+     * rejilla, se usa para modificarlo en la base de datos cuando este no es
+     * un primary de key, porque en ese caso da error hibernate
+     */
+    public String nifPinchado; 
+    
+    /**
+    * objeto q da acceso a metodos de operaciones de insertar, editar, eliminar,
+    * conexion a la base de datos, control de transacciones y otras con hibernate
+    */ 
     private ClientesDAO cdao=new ClientesDAO();
-    /* fin josem*/
+  
+    /**
+     * Objeto que da acceso a entorno de la ventalla de detalle para compartir
+     * con este programa  datos o metodos
+     */
     
     private VentanaDetalle wDetalle;  
      
     public VentanaPrincipal() {
        
+        this.wDetalle=new VentanaDetalle();           
         this.creaModeloRejilla();
         this.cargaDatos();
-        this.wDetalle=new VentanaDetalle();   
-        
+
         initComponents();
       
     }
@@ -50,7 +58,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                              };
         
         
-         // a?adirmos las columnas al modelo.
+         // se añaden las columnas q se quierne mostrar al modelo.
         
      this.modelo.addColumn("NIF");
      this.modelo.addColumn("Nombre");
@@ -58,14 +66,13 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     
     private void cargaDatos() 
     {
-   
-         this.modelo.getDataVector().removeAllElements(); // borramos todos los elementos anteriores..
+       // Se borran todos los elementos q se tengan en este momento en la rejilla.
+         this.modelo.getDataVector().removeAllElements(); 
  
-         /* modificado por josem */
-         // aqui el llenado del modelo se obtiene del llamado a la rutina
-         // llenaRejilla que la pesa el modelo que la misma debe llenar
+       // aqui el rellenado de datos del modelo se obtiene del llamado a la rutina
+       // llenaRejilla del ofrece cdao, que devuelve el contenido que 
          this.modelo=cdao.llenaRejilla(this.modelo);
-        /*fin modificaicon josem */
+    
      }
  
     /**
@@ -237,21 +244,24 @@ public class VentanaPrincipal extends javax.swing.JFrame {
       
     private String dameElNifPinchado (java.awt.event.MouseEvent evt)
     {
-        Point p = evt.getPoint();   // da la posici\F3n del click 
-        int row = this.rejillaDatos.rowAtPoint(p); // dada la posici\F3n del click en la rejilla nos da la fila.
-        return dameElNifPinchado(row);
+        Point p = evt.getPoint();  // no indica la posición del click 
+        int row = this.rejillaDatos.rowAtPoint(p); // dada la posición del click en la rejilla nos da la fila.
+        return dameElNifPinchado(row); // devuelve el nif identificador del renglón
     }
-   
-    private void recargaDatos( java.awt.event.MouseEvent evt) //sobrecarga
+  // Cuando se hace doble click sobre un renglón de la rejilla este metodo lo captura
+  // Recarga los datos en la ventana de Detalle
+    private void recargaDatos( java.awt.event.MouseEvent evt) 
     {
          this.wDetalle.recargaDatos( this.dameElNifPinchado(evt));
     }
-   
+  // Cuando se recorre la rejilla por navegacion de la teclas arriba, abajo, inicio o fin este metodo es invocado
+  // Recarga los datos en la ventana de Detalle    
     private void recargaDatos(int fila)
     {
        this.wDetalle.recargaDatos( this.dameElNifPinchado(fila));
       
     }
+    
     private void rejillaDatosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_rejillaDatosMouseClicked
         
             
@@ -311,8 +321,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_btnAnteriorActionPerformed
 
    
-    /*
-      BOTON DE BORRADO
+    /**
+    * Boton ELIMINACION DEL REGISTRO Q MUESTRA LA FILA
     */
     private void btnBorrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBorrarActionPerformed
         int n=this.rejillaDatos.getSelectedRow();
@@ -334,7 +344,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_btnBorrarActionPerformed
 
     /*
-    INSERTAR NUEVA FILA 
+    *Boton INSERTAR NUEVO REGISTRO EN UNA NUEVA FILA 
     */
     
     private void btnNuevaFilaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevaFilaActionPerformed
@@ -367,7 +377,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_btnNuevaFilaActionPerformed
     
     /*
-    MODIFICAR FILA 
+    * Boton MODIFICAR REGISTRO Q CONTIENE LA FILA 
     */
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
          
@@ -411,7 +421,9 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         
     }//GEN-LAST:event_btnModificarActionPerformed
 
-    //añadido por josem
+    /**
+     * Boton SALIR DE LA APLICACION
+     */
     private void jButtonSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSalirActionPerformed
         // cierra la aplicacion completa y sale de la misma
         System.exit(0);
